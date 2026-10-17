@@ -192,6 +192,16 @@ export function Studio() {
   );
 }
 
+function missingSetup(health: Health): string[] {
+  const s = health.setup;
+  if (!s) return [];
+  return [
+    !s.redis && "Upstash Redis",
+    !s.blob && "Blob",
+    !s.workerSecret && "WORKER_SECRET",
+  ].filter((x): x is string => Boolean(x));
+}
+
 function WorkerStatus({ health }: { health: Health | null }) {
   const state = !health
     ? { cls: "unknown", text: "連線中…" }
@@ -207,11 +217,13 @@ function WorkerStatus({ health }: { health: Health | null }) {
         {state.text}
       </div>
       <p>
-        {health?.workerOnline
-          ? health.queued > 0
-            ? `目前排隊 ${health.queued} 首`
-            : "現在送出會馬上開始"
-          : "仍可送出，服務上線後依序生成"}
+        {health && (!health.configured || missingSetup(health).length > 0)
+          ? `網站管理員：Vercel 缺少 ${missingSetup(health).join("、") || "Redis 連線"}，設定後請 Redeploy`
+          : health?.workerOnline
+            ? health.queued > 0
+              ? `目前排隊 ${health.queued} 首`
+              : "現在送出會馬上開始"
+            : "仍可送出，服務上線後依序生成"}
       </p>
       <p className="powered">由 Claude 作詞作曲 · ACE-Step 演唱</p>
     </div>

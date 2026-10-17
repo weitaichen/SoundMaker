@@ -1,4 +1,5 @@
 import { generateClientTokenFromReadWriteToken } from "@vercel/blob/client";
+import { findBlobToken } from "@/lib/env";
 import { getJob } from "@/lib/jobs";
 import { error, isWorker, json } from "@/lib/http";
 
@@ -24,7 +25,8 @@ export async function POST(
   if (!filename.endsWith(".mp3")) return error("Only .mp3 uploads", 400);
 
   const pathname = `songs/${id}/${filename}`;
-  if (!process.env.BLOB_READ_WRITE_TOKEN) {
+  const blobToken = findBlobToken();
+  if (!blobToken) {
     if (process.env.NODE_ENV === "production") {
       return error("BLOB_READ_WRITE_TOKEN is not set (connect a Vercel Blob store).", 500);
     }
@@ -32,6 +34,7 @@ export async function POST(
     return json({ pathname, token: "", devUploadPath: `/api/dev-files/${pathname}` });
   }
   const token = await generateClientTokenFromReadWriteToken({
+    token: blobToken,
     pathname,
     allowedContentTypes: ["audio/mpeg"],
     maximumSizeInBytes: MAX_BYTES,

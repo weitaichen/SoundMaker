@@ -1,4 +1,5 @@
 import { Redis } from "@upstash/redis";
+import { findRedisEnv } from "./env";
 
 /** The subset of Redis this app uses. */
 export interface Store {
@@ -13,14 +14,10 @@ export interface Store {
   expire(key: string, seconds: number): Promise<unknown>;
 }
 
-// Upstash via the Vercel Marketplace injects KV_REST_API_* (and sometimes
-// UPSTASH_REDIS_REST_*); accept either naming.
-const url = process.env.UPSTASH_REDIS_REST_URL ?? process.env.KV_REST_API_URL;
-const token =
-  process.env.UPSTASH_REDIS_REST_TOKEN ?? process.env.KV_REST_API_TOKEN;
+const redisEnv = findRedisEnv();
 
 /** Local `next dev` without Upstash: keep everything in memory. */
-export const devMode = !url && process.env.NODE_ENV !== "production";
+export const devMode = !redisEnv && process.env.NODE_ENV !== "production";
 
 class MemoryStore implements Store {
   private data = new Map<string, { v: unknown; exp?: number }>();
@@ -86,8 +83,8 @@ const g = globalThis as unknown as { __aimusicStore?: Store };
 
 export function redis(): Store {
   if (g.__aimusicStore) return g.__aimusicStore;
-  if (url && token) {
-    g.__aimusicStore = new Redis({ url, token }) as unknown as Store;
+  if (redisEnv) {
+    g.__aimusicStore = new Redis(redisEnv) as unknown as Store;
   } else if (devMode) {
     g.__aimusicStore = new MemoryStore();
   } else {

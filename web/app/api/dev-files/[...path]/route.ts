@@ -2,11 +2,11 @@
 // is not set, so the whole flow can be tried on one machine.
 import { mkdir, readFile, stat, writeFile } from "node:fs/promises";
 import { dirname, join, resolve, sep } from "node:path";
+import { findBlobToken } from "@/lib/env";
 import { error, isWorker, json } from "@/lib/http";
 
 const ROOT = join(process.cwd(), ".dev-uploads");
-const enabled = () =>
-  process.env.NODE_ENV !== "production" && !process.env.BLOB_READ_WRITE_TOKEN;
+const enabled = () => process.env.NODE_ENV !== "production" && !findBlobToken();
 
 function resolvePath(parts: string[]): string | null {
   const full = resolve(ROOT, parts.join("/"));

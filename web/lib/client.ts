@@ -45,6 +45,7 @@ export interface Health {
   queued: number;
   references: ReferenceStyle[];
   accessCodeRequired: boolean;
+  setup?: { redis: boolean; blob: boolean; workerSecret: boolean };
 }
 
 export async function fetchHealth(): Promise<Health> {
