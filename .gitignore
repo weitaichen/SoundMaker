@@ -1,0 +1,18 @@
+node_modules/
+.next/
+.vercel/
+out/
+.dev-uploads/
+*.tsbuildinfo
+next-env.d.ts
+
+.env
+.env.local
+.env*.local
+
+# Local music engine (cloned separately, has its own git + multi-GB models)
+/engines/
+
+# Reference songs are your own audio files — keep them off GitHub
+worker/references/*
+!worker/references/references.json

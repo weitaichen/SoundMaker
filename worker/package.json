@@ -1,0 +1,23 @@
+{
+  "name": "aimusic-worker",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Runs on your PC: pulls song requests from the website, has Claude write them, renders audio locally, uploads to Vercel Blob.",
+  "scripts": {
+    "start": "node --env-file-if-exists=.env src/index.ts",
+    "compose": "node --env-file-if-exists=.env src/cli.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "engines": {
+    "node": ">=22.18"
+  },
+  "dependencies": {
+    "@vercel/blob": "^2.8.2",
+    "opencc-js": "^1.4.2"
+  },
+  "devDependencies": {
+    "@types/node": "^24.19.2",
+    "typescript": "^5.9.3"
+  }
+}
